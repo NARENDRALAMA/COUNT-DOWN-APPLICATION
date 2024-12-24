@@ -1,27 +1,44 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./Countdown.css";
 
 function Countdown() {
   const [target, setTarget] = useState(null);
-  const [now, setNow] = useState(null);
   const [diff, setDiff] = useState(0);
-  const [id, setId] = useState(-1);
+  const id = useRef(0);
 
   function handleSubmit() {
-    const intervalID = setInterval(() => {
-      setId(intervalID);
-      console.log(intervalID);
+    id.current = setInterval(() => {
       setDiff(new Date(target) - new Date());
-
-      if (diff < 0) {
-        clearInterval(id);
-      }
+      console.log(diff);
     }, 1000);
   }
 
   useEffect(() => {
-    setDiff(new Date(target) - new Date());
-  }, [target]);
+    if (diff < 0) {
+      clearInterval(id.current);
+      setDiff(0);
+    }
+  }, [diff]);
+
+  const getDays = () => {
+    return Math.floor(diff / (1000 * 60 * 60 * 24));
+  };
+
+  const getHours = () => {
+    const hoursInMs = diff % (1000 * 60 * 60 * 24);
+    return Math.floor(hoursInMs / (1000 * 60 * 60));
+  };
+
+  const getMinutes = () => {
+    const minutesInMs = diff % (1000 * 60 * 60);
+    return Math.floor(minutesInMs / (1000 * 60));
+  };
+
+  const getSeconds = () => {
+    const secondsInMs = diff % (1000 * 60);
+    return Math.floor(secondsInMs / 1000);
+  };
+
   return (
     <>
       <h1>Countdown timer app</h1>
@@ -36,24 +53,22 @@ function Countdown() {
         </button>
       </div>
 
-      {diff}
-
       <div id="display">
         <ul>
           <li>
-            <span id="days"></span>
+            <span id="days">{getDays()}</span>
             days
           </li>
           <li>
-            <span id="hours"></span>
+            <span id="hours">{getHours()}</span>
             hours
           </li>
           <li>
-            <span id="minutes"></span>
+            <span id="minutes">{getMinutes()}</span>
             minutes
           </li>
           <li>
-            <span id="seconds"></span>
+            <span id="seconds">{getSeconds()}</span>
             seconds
           </li>
         </ul>
